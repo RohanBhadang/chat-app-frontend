@@ -2,7 +2,6 @@ import { useState } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
 import {socket} from "../services/socket";
-
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
