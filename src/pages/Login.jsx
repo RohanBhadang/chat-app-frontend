@@ -24,7 +24,7 @@ export default function Login() {
 
       connectSocket(res.data.accessToken);
 
-      navigate("/"); // 👈 🔥 MOST IMPORTANT
+      navigate("/feed"); // 👈 🔥 MOST IMPORTANT
     } catch (err) {
       console.log("Login error:", err);
     }
