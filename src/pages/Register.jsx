@@ -6,7 +6,7 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const register = async () => {
@@ -25,6 +25,11 @@ export default function Register() {
       navigate("/"); // 👈 direct chat page
     } catch (err) {
       console.log("Register error:", err);
+        // ✅ show backend error
+      setError(
+        err.response?.data?.message ||
+        "Registration failed"
+      );
     }
   };
 
@@ -53,6 +58,12 @@ export default function Register() {
           className="block mb-2 p-2 w-full text-black"
         />
 
+        {/* ✅ Error Message */}
+        {error && (
+          <p className="text-red-400 text-sm mb-2">
+            {error}
+          </p>
+        )}
         <button
           onClick={register}
           className="bg-green-500 w-full py-2 mt-2"

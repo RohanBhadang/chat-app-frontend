@@ -23,7 +23,7 @@ export default function Sidebar() {
 
       try {
 
-        // 🔹 CREATE CHAT
+        //CREATE CHAT
         const res = await API.post(
   `/chat/create-one-to-one/${user._id}`
 );
@@ -41,14 +41,14 @@ export default function Sidebar() {
         );
 
 
-        // 🔹 JOIN SOCKET ROOM
+        //JOIN SOCKET ROOM
         socket.emit(
           "join_chat",
           chatId
         );
 
 
-        // 🔹 LOAD OLD MESSAGES
+        // LOAD OLD MESSAGES
         const msgs =
           await API.get(
             `/chat/${chatId}`

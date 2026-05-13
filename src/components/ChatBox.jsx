@@ -30,6 +30,7 @@ export default function ChatBox() {
       message: text,
     });
 
+    
     setText("");
   };
 
@@ -61,9 +62,16 @@ export default function ChatBox() {
       {/* MESSAGES */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2 z-10 scrollbar-thin scrollbar-thumb-[#374045] scrollbar-track-transparent">
         {messages.map((m, i) => {
-          const isMe =
-            m.senderId?._id === currentUserId || m.senderId === currentUserId;
+          // const isMe =
+          //   m.senderId?._id === currentUserId || m.senderId === currentUserId;
+             const senderId =
+             typeof m.senderId === "object"
+              ? m.senderId?._id
+             : m.senderId;
 
+const isMe =
+  String(senderId) === String(currentUserId);
+          
           return (
             <div
               key={i}
@@ -77,10 +85,10 @@ export default function ChatBox() {
                 }`}
               >
                 {/* sender name (only for others in groups, you can keep or remove this if it's 1-on-1) */}
-                {!isMe && (
-                  <span className="text-[12px] font-medium text-[#53bdeb] mb-0.5">
-                    {m.senderId?.name || selectedUser.name}
-                  </span>
+                {!isMe && m.senderId?.name && (
+                <span className="text-[12px] font-medium text-[#53bdeb] mb-0.5">
+                 {m.senderId.name}
+                 </span>
                 )}
 
                 {/* message text and time container */}
@@ -122,7 +130,6 @@ export default function ChatBox() {
           disabled={!text.trim()}
           className="p-2.5 bg-[#00a884] text-[#111b21] rounded-full font-bold hover:bg-[#00c298] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
-          {/* Send Icon alternative using text (bhai Dev Connect me Lucide icon use kar lena agar available ho toh) */}
           <svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor">
             <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
           </svg>
