@@ -78,166 +78,283 @@ export default function Requests() {
 
 
 
-  return (
+//   return (
 
-    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black text-white p-6">
+//     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black text-white p-6">
 
-      {/* HEADER */}
-      <div className="max-w-3xl mx-auto mb-8">
+//       {/* HEADER */}
+//       <div className="max-w-3xl mx-auto mb-8">
 
-        <h1 className="text-4xl font-bold tracking-tight">
-          Connection Requests
-        </h1>
+//         <h1 className="text-4xl font-bold tracking-tight">
+//           Connection Requests
+//         </h1>
 
-        <p className="text-zinc-400 mt-2">
-          Manage your incoming connection requests
-        </p>
+//         <p className="text-zinc-400 mt-2">
+//           Manage your incoming connection requests
+//         </p>
 
-      </div>
-
-
-
-      {/* LOADING SKELETON */}
-      {loading && (
-
-        <div className="max-w-3xl mx-auto space-y-4">
-
-          {[1, 2, 3].map((item) => (
-
-            <div
-              key={item}
-              className="animate-pulse bg-zinc-900 border border-zinc-800 rounded-2xl p-5"
-            >
-
-              <div className="flex items-center gap-4">
-
-                <div className="w-14 h-14 rounded-full bg-zinc-700"></div>
-
-                <div className="flex-1">
-
-                  <div className="h-4 w-40 bg-zinc-700 rounded mb-3"></div>
-
-                  <div className="h-3 w-28 bg-zinc-800 rounded"></div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      )}
+//       </div>
 
 
 
-      {/* EMPTY STATE */}
-      {!loading &&
-        requests.length === 0 && (
+//       {/* LOADING SKELETON */}
+//       {loading && (
 
-        <div className="max-w-3xl mx-auto">
+//         <div className="max-w-3xl mx-auto space-y-4">
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-10 text-center">
+//           {[1, 2, 3].map((item) => (
 
-            <h2 className="text-2xl font-semibold mb-2">
-              No Pending Requests
-            </h2>
+//             <div
+//               key={item}
+//               className="animate-pulse bg-zinc-900 border border-zinc-800 rounded-2xl p-5"
+//             >
 
-            <p className="text-zinc-400">
-              You don’t have any connection requests right now.
-            </p>
+//               <div className="flex items-center gap-4">
 
-          </div>
+//                 <div className="w-14 h-14 rounded-full bg-zinc-700"></div>
 
-        </div>
+//                 <div className="flex-1">
 
-      )}
+//                   <div className="h-4 w-40 bg-zinc-700 rounded mb-3"></div>
 
+//                   <div className="h-3 w-28 bg-zinc-800 rounded"></div>
 
+//                 </div>
 
-      {/* REQUESTS */}
-      {!loading &&
-        requests.length > 0 && (
+//               </div>
 
-        <div className="max-w-3xl mx-auto space-y-5">
+//             </div>
 
-          {requests.map((req) => (
+//           ))}
 
-            <div
-              key={req._id}
-              className="bg-zinc-900/90 backdrop-blur-md border border-zinc-800 rounded-2xl p-5 shadow-xl hover:border-zinc-700 transition-all duration-300"
-            >
+//         </div>
 
-              <div className="flex items-center justify-between flex-wrap gap-4">
-
-                {/* USER INFO */}
-                <div className="flex items-center gap-4">
-
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl font-bold uppercase">
-
-                    {req.fromUserId?.name?.charAt(0)}
-
-                  </div>
-
-                  <div>
-
-                    <h2 className="text-lg font-semibold">
-                      {req.fromUserId?.name}
-                    </h2>
-
-                    <p className="text-sm text-zinc-400">
-                      {req.fromUserId?.email}
-                    </p>
-
-                  </div>
-
-                </div>
+//       )}
 
 
 
-                {/* ACTION BUTTONS */}
-                <div className="flex items-center gap-3">
+//       {/* EMPTY STATE */}
+//       {!loading &&
+//         requests.length === 0 && (
 
-                  <button
-                    onClick={() =>
-                      reviewRequest(
-                        req._id,
-                        "accepted"
-                      )
-                    }
-                    className="px-5 py-2 rounded-xl bg-green-500 hover:bg-green-600 transition-all duration-200 font-medium"
-                  >
-                    Accept
-                  </button>
+//         <div className="max-w-3xl mx-auto">
 
-                  <button
-                    onClick={() =>
-                      reviewRequest(
-                        req._id,
-                        "rejected"
-                      )
-                    }
-                    className="px-5 py-2 rounded-xl bg-red-500 hover:bg-red-600 transition-all duration-200 font-medium"
-                  >
-                    Reject
-                  </button>
+//           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-10 text-center">
 
-                </div>
+//             <h2 className="text-2xl font-semibold mb-2">
+//               No Pending Requests
+//             </h2>
 
-              </div>
+//             <p className="text-zinc-400">
+//               You don’t have any connection requests right now.
+//             </p>
 
-            </div>
+//           </div>
 
-          ))}
+//         </div>
 
-        </div>
+//       )}
 
-      )}
+
+
+//       {/* REQUESTS */}
+//       {!loading &&
+//         requests.length > 0 && (
+
+//         <div className="max-w-3xl mx-auto space-y-5">
+
+//           {requests.map((req) => (
+
+//             <div
+//               key={req._id}
+//               className="bg-zinc-900/90 backdrop-blur-md border border-zinc-800 rounded-2xl p-5 shadow-xl hover:border-zinc-700 transition-all duration-300"
+//             >
+
+//               <div className="flex items-center justify-between flex-wrap gap-4">
+
+//                 {/* USER INFO */}
+//                 <div className="flex items-center gap-4">
+
+//                   <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl font-bold uppercase">
+
+//                     {req.fromUserId?.name?.charAt(0)}
+
+//                   </div>
+
+//                   <div>
+
+//                     <h2 className="text-lg font-semibold">
+//                       {req.fromUserId?.name}
+//                     </h2>
+
+//                     <p className="text-sm text-zinc-400">
+//                       {req.fromUserId?.email}
+//                     </p>
+
+//                   </div>
+
+//                 </div>
+
+
+
+//                 {/* ACTION BUTTONS */}
+//                 <div className="flex items-center gap-3">
+
+//                   <button
+//                     onClick={() =>
+//                       reviewRequest(
+//                         req._id,
+//                         "accepted"
+//                       )
+//                     }
+//                     className="px-5 py-2 rounded-xl bg-green-500 hover:bg-green-600 transition-all duration-200 font-medium"
+//                   >
+//                     Accept
+//                   </button>
+
+//                   <button
+//                     onClick={() =>
+//                       reviewRequest(
+//                         req._id,
+//                         "rejected"
+//                       )
+//                     }
+//                     className="px-5 py-2 rounded-xl bg-red-500 hover:bg-red-600 transition-all duration-200 font-medium"
+//                   >
+//                     Reject
+//                   </button>
+
+//                 </div>
+
+//               </div>
+
+//             </div>
+
+//           ))}
+
+//         </div>
+
+//       )}
+
+//     </div>
+
+//   );
+
+// }
+return (
+  <div className="min-h-screen bg-gray-50 text-gray-900 p-6">
+
+    {/* HEADER */}
+    <div className="max-w-3xl mx-auto mb-8 text-center">
+
+      <h1 className="text-4xl font-bold text-green-700 tracking-tight">
+        Connection Requests
+      </h1>
+
+      <p className="text-gray-500 mt-2">
+        Manage your incoming connection requests
+      </p>
 
     </div>
 
-  );
+    {/* LOADING */}
+    {loading && (
+      <div className="max-w-3xl mx-auto space-y-4">
 
-}
+        {[1, 2, 3].map((item) => (
+          <div
+            key={item}
+            className="animate-pulse bg-white border border-gray-200 rounded-2xl p-5 shadow-sm"
+          >
+            <div className="flex items-center gap-4">
+
+              <div className="w-14 h-14 rounded-full bg-gray-200"></div>
+
+              <div className="flex-1">
+                <div className="h-4 w-40 bg-gray-200 rounded mb-3"></div>
+                <div className="h-3 w-28 bg-gray-100 rounded"></div>
+              </div>
+
+            </div>
+          </div>
+        ))}
+
+      </div>
+    )}
+
+    {/* EMPTY */}
+    {!loading && requests.length === 0 && (
+      <div className="max-w-3xl mx-auto">
+        <div className="bg-white border border-gray-200 rounded-2xl p-10 text-center shadow-sm">
+
+          <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+            No Pending Requests
+          </h2>
+
+          <p className="text-gray-500">
+            You don’t have any connection requests right now.
+          </p>
+
+        </div>
+      </div>
+    )}
+
+    {/* REQUESTS */}
+    {!loading && requests.length > 0 && (
+      <div className="max-w-3xl mx-auto space-y-5">
+
+        {requests.map((req) => (
+          <div
+            key={req._id}
+            className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition"
+          >
+
+            <div className="flex items-center justify-between flex-wrap gap-4">
+
+              {/* USER */}
+              <div className="flex items-center gap-4">
+
+                <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xl uppercase">
+                  {req.fromUserId?.name?.charAt(0)}
+                </div>
+
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {req.fromUserId?.name}
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    {req.fromUserId?.email}
+                  </p>
+                </div>
+
+              </div>
+
+              {/* BUTTONS */}
+              <div className="flex items-center gap-3">
+
+                <button
+                  onClick={() => reviewRequest(req._id, "accepted")}
+                  className="px-5 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition"
+                >
+                  Accept
+                </button>
+
+                <button
+                  onClick={() => reviewRequest(req._id, "rejected")}
+                  className="px-5 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 transition"
+                >
+                  Reject
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        ))}
+
+      </div>
+    )}
+
+  </div>
+)}

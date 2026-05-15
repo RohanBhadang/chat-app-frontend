@@ -1,87 +1,283 @@
+// import { useState } from "react";
+// import API from "../services/api";
+// import { useNavigate } from "react-router-dom";
+// import {socket} from "../services/socket";
+// export default function Register() {
+//   const [name, setName] = useState("");
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+// const [error, setError] = useState("");
+//   const navigate = useNavigate();
+
+//   const register = async () => {
+//     try {
+//       const res = await API.post("/auth/register", {
+//         name,
+//         email,
+//         password,
+//       });
+
+//       // ✅ same as login
+//       localStorage.setItem("token", res.data.accessToken);
+
+//       connectSocket(res.data.accessToken);
+
+//       navigate("/"); // 👈 direct chat page
+//     } catch (err) {
+//       console.log("Register error:", err);
+//         // ✅ show backend error
+//       setError(
+//         err.response?.data?.message ||
+//         "Registration failed"
+//       );
+//     }
+//   };
+
+//   return (
+//     <div className="h-screen flex items-center justify-center bg-black">
+//       <div className="p-6 bg-gray-800 text-white w-80 rounded">
+
+//         <h2 className="text-xl mb-4 text-center">Register</h2>
+
+//         <input
+//           placeholder="Name"
+//           onChange={(e)=>setName(e.target.value)}
+//           className="block mb-2 p-2 w-full text-black"
+//         />
+
+//         <input
+//           placeholder="Email"
+//           onChange={(e)=>setEmail(e.target.value)}
+//           className="block mb-2 p-2 w-full text-black"
+//         />
+
+//         <input
+//           type="password"
+//           placeholder="Password"
+//           onChange={(e)=>setPassword(e.target.value)}
+//           className="block mb-2 p-2 w-full text-black"
+//         />
+
+//         {/* ✅ Error Message */}
+//         {error && (
+//           <p className="text-red-400 text-sm mb-2">
+//             {error}
+//           </p>
+//         )}
+//         <button
+//           onClick={register}
+//           className="bg-green-500 w-full py-2 mt-2"
+//         >
+//           Register
+//         </button>
+
+//         <p className="text-sm mt-3 text-center">
+//           Already have account?{" "}
+//           <span
+//             className="text-green-400 cursor-pointer"
+//             onClick={() => navigate("/login")}
+//           >
+//             Login
+//           </span>
+//         </p>
+
+//       </div>
+//     </div>
+//   );
+// }
+
+
 import { useState } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
-import {socket} from "../services/socket";
+import { socket } from "../services/socket";
+import { connectSocket } from "../services/socket";
+
 export default function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-const [error, setError] = useState("");
-  const navigate = useNavigate();
+
+  const [name, setName] =
+    useState("");
+
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [error, setError] =
+    useState("");
+
+  const navigate =
+    useNavigate();
 
   const register = async () => {
+
     try {
-      const res = await API.post("/auth/register", {
-        name,
-        email,
-        password,
-      });
 
-      // ✅ same as login
-      localStorage.setItem("token", res.data.accessToken);
+      const res =
+        await API.post(
+          "/auth/register",
+          {
+            name,
+            email,
+            password,
+          }
+        );
 
-      connectSocket(res.data.accessToken);
+      localStorage.setItem(
+        "token",
+        res.data.accessToken
+      );
 
-      navigate("/"); // 👈 direct chat page
+      connectSocket(
+        res.data.accessToken
+      );
+
+      navigate("/feed");
+
     } catch (err) {
-      console.log("Register error:", err);
-        // ✅ show backend error
+
+      console.log(
+        "Register error:",
+        err
+      );
+
       setError(
-        err.response?.data?.message ||
-        "Registration failed"
+        err.response?.data
+          ?.message ||
+          "Registration failed"
       );
     }
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-black">
-      <div className="p-6 bg-gray-800 text-white w-80 rounded">
 
-        <h2 className="text-xl mb-4 text-center">Register</h2>
+    <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center px-4">
 
-        <input
-          placeholder="Name"
-          onChange={(e)=>setName(e.target.value)}
-          className="block mb-2 p-2 w-full text-black"
-        />
+      <div className="w-full max-w-5xl bg-white rounded-[40px] shadow-xl overflow-hidden grid md:grid-cols-2">
 
-        <input
-          placeholder="Email"
-          onChange={(e)=>setEmail(e.target.value)}
-          className="block mb-2 p-2 w-full text-black"
-        />
+        {/* LEFT IMAGE */}
+        <div className="hidden md:block h-[650px]">
 
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e)=>setPassword(e.target.value)}
-          className="block mb-2 p-2 w-full text-black"
-        />
+          <img
+            src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1200&auto=format&fit=crop"
+            alt="register"
+            className="w-full h-full object-cover"
+          />
 
-        {/* ✅ Error Message */}
-        {error && (
-          <p className="text-red-400 text-sm mb-2">
-            {error}
-          </p>
-        )}
-        <button
-          onClick={register}
-          className="bg-green-500 w-full py-2 mt-2"
-        >
-          Register
-        </button>
+        </div>
 
-        <p className="text-sm mt-3 text-center">
-          Already have account?{" "}
-          <span
-            className="text-green-400 cursor-pointer"
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </span>
-        </p>
+        {/* RIGHT */}
+        <div className="flex items-center justify-center px-8 py-10 md:px-14">
+
+          <div className="w-full max-w-md">
+
+            <h1 className="text-3xl font-bold text-[#2d6a4f] mb-2">
+              Create Account
+            </h1>
+
+            <p className="text-gray-500 text-sm mb-8">
+              Start chatting with Gutargu
+            </p>
+
+            {/* NAME */}
+            <div className="mb-5">
+
+              <label className="block text-sm font-medium mb-2 text-gray-700">
+                Name
+              </label>
+
+              <input
+                type="text"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e) =>
+                  setName(e.target.value)
+                }
+                className="w-full border border-[#b7e4c7] rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-[#40916c]"
+              />
+
+            </div>
+
+            {/* EMAIL */}
+            <div className="mb-5">
+
+              <label className="block text-sm font-medium mb-2 text-gray-700">
+                Email
+              </label>
+
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
+                className="w-full border border-[#b7e4c7] rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-[#40916c]"
+              />
+
+            </div>
+
+            {/* PASSWORD */}
+            <div className="mb-5">
+
+              <label className="block text-sm font-medium mb-2 text-gray-700">
+                Password
+              </label>
+
+              <input
+                type="password"
+                placeholder="Create password"
+                value={password}
+                onChange={(e) =>
+                  setPassword(
+                    e.target.value
+                  )
+                }
+                className="w-full border border-[#b7e4c7] rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-[#40916c]"
+              />
+
+            </div>
+
+            {/* ERROR */}
+            {error && (
+
+              <p className="text-red-500 text-sm mb-4">
+                {error}
+              </p>
+
+            )}
+
+            {/* BUTTON */}
+            <button
+              onClick={register}
+              className="w-full bg-[#2d6a4f] hover:bg-[#1b4332] transition text-white py-3 rounded-full font-semibold"
+            >
+              Register
+            </button>
+
+            {/* LOGIN */}
+            <p className="text-center text-sm text-gray-600 mt-6">
+
+              Already have an account?{" "}
+
+              <button
+                onClick={() =>
+                  navigate("/")
+                }
+                className="text-[#2d6a4f] font-semibold hover:underline"
+              >
+                Login
+              </button>
+
+            </p>
+
+          </div>
+
+        </div>
 
       </div>
+
     </div>
   );
 }
