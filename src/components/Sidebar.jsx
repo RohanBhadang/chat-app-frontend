@@ -75,16 +75,16 @@ export default function Sidebar() {
 
   return (
 
-    <div className="w-[350px] h-full bg-zinc-900/80 backdrop-blur-xl border-r border-zinc-800 text-white overflow-y-auto">
+    <div className="w-[350px] h-full sidebar-surface border-r app-border text-gray-900 overflow-y-auto">
 
       {/* HEADER */}
-      <div className="p-5 border-b border-zinc-800 sticky top-0 bg-zinc-900/95 backdrop-blur-xl z-10">
+      <div className="p-5 border-b app-border sticky top-0 app-surface z-10">
 
         <h1 className="text-2xl font-bold">
           Chats
         </h1>
 
-        <p className="text-sm text-zinc-400 mt-1">
+        <p className="text-sm text-muted mt-1">
           Your connected people
         </p>
 
@@ -104,7 +104,7 @@ export default function Sidebar() {
               selectUser(u)
             }
 
-            className="flex items-center gap-4 p-4 rounded-2xl cursor-pointer bg-zinc-900 hover:bg-zinc-800 border border-transparent hover:border-zinc-700 transition-all duration-300"
+            className="flex items-center gap-4 p-4 rounded-2xl cursor-pointer sidebar-item transition-all duration-300"
           >
 
             {/* AVATAR */}
@@ -119,11 +119,11 @@ export default function Sidebar() {
             {/* INFO */}
             <div className="flex-1 min-w-0">
 
-              <h2 className="font-semibold text-white truncate">
+              <h2 className="font-semibold text-gray-900 truncate">
                 {u.name}
               </h2>
 
-              <p className="text-sm text-zinc-400 truncate">
+              <p className="text-sm text-muted truncate">
                 {u.email}
               </p>
 

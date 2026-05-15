@@ -67,151 +67,91 @@ export default function Connections() {
 
   return (
 
-    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black text-white p-6">
+    <div className="min-h-screen chat-bg text-gray-900 p-6">
 
-      {/* HEADER */}
-      <div className="max-w-4xl mx-auto mb-8">
+      <div className="max-w-5xl mx-auto space-y-6">
 
-        <h1 className="text-4xl font-bold tracking-tight">
-          My Connections
-        </h1>
-
-        <p className="text-zinc-400 mt-2">
-          People connected with you
-        </p>
-
-      </div>
-
-
-      {/* LOADING */}
-      {loading && (
-
-        <div className="max-w-4xl mx-auto grid gap-5 md:grid-cols-2">
-
-          {[1, 2, 3, 4].map((item) => (
-
-            <div
-              key={item}
-              className="animate-pulse bg-zinc-900 border border-zinc-800 rounded-3xl p-5"
-            >
-
-              <div className="flex items-center gap-4">
-
-                <div className="w-16 h-16 rounded-full bg-zinc-700"></div>
-
-                <div className="flex-1">
-
-                  <div className="h-4 w-40 bg-zinc-700 rounded mb-3"></div>
-
-                  <div className="h-3 w-28 bg-zinc-800 rounded"></div>
-
-                </div>
-
-              </div>
-
+        <section className="card p-8 shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-4xl font-bold tracking-tight text-primary">
+                My Connections
+              </h1>
+              <p className="text-gray-500 mt-2">
+                People connected with you in Gutargu.
+              </p>
             </div>
+            <div className="rounded-full bg-[#e9f7ee] border border-[#c7ecd0] px-4 py-2 text-sm font-semibold text-[#2d6a4f] shadow-sm">
+              {connections.length} connected
+            </div>
+          </div>
+        </section>
 
-          ))}
-
-        </div>
-
-      )}
-
-
-      {/* EMPTY */}
-      {!loading &&
-        connections.length === 0 && (
-
-        <div className="max-w-4xl mx-auto">
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 text-center">
-
-            <h2 className="text-2xl font-semibold mb-2">
+        {loading ? (
+          <div className="grid gap-5 md:grid-cols-2">
+            {[1, 2, 3, 4].map((item) => (
+              <div key={item} className="animate-pulse card p-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-gray-200"></div>
+                  <div className="flex-1 space-y-3 py-1">
+                    <div className="h-4 w-3/4 bg-gray-200 rounded"></div>
+                    <div className="h-3 w-1/2 bg-gray-200 rounded"></div>
+                    <div className="h-10 w-full bg-gray-200 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : connections.length === 0 ? (
+          <div className="card p-10 text-center">
+            <h2 className="text-2xl font-semibold mb-3 text-gray-900">
               No Connections Yet
             </h2>
-
-            <p className="text-zinc-400">
-              Accept requests to grow your network.
+            <p className="text-gray-500">
+              Accept requests to start chatting and build your network.
             </p>
-
           </div>
-
-        </div>
-
-      )}
-
-
-      {/* CONNECTIONS */}
-      {!loading &&
-        connections.length > 0 && (
-
-        <div className="max-w-4xl mx-auto grid gap-5 md:grid-cols-2">
-
-          {connections.map((user) => (
-
-            <div
-              key={user._id}
-              className="bg-zinc-900/90 backdrop-blur-md border border-zinc-800 rounded-3xl p-5 shadow-xl hover:border-zinc-700 transition-all duration-300"
-            >
-
-              <div className="flex items-center justify-between gap-4">
-
-                {/* USER */}
-                <div className="flex items-center gap-4">
-
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-2xl font-bold uppercase shadow-lg">
-
-                    {user?.name?.charAt(0)}
-
+        ) : (
+          <div className="grid gap-5 md:grid-cols-2">
+            {connections.map((user) => (
+              <div
+                key={user._id}
+                className="card p-6 shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#25D366] via-[#1fae4f] to-[#128c7e] flex items-center justify-center text-2xl font-bold uppercase text-white shadow-lg">
+                    {user?.name?.charAt(0) || "U"}
                   </div>
-
-                  <div>
-
-                    <h2 className="text-xl font-semibold">
-                      {user?.name}
-                    </h2>
-
-                    <p className="text-sm text-zinc-400 break-all">
-                      {user?.email}
-                    </p>
-
-                    <div className="flex items-center gap-2 mt-2">
-
-                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
-
-                      <span className="text-xs text-zinc-400">
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <h2 className="text-xl font-semibold text-gray-900">
+                        {user?.name}
+                      </h2>
+                      <span className="rounded-full bg-[#e9f7ee] px-3 py-1 text-xs font-semibold text-[#2d6a4f]">
                         Connected
                       </span>
-
                     </div>
-
+                    <p className="mt-2 text-sm text-gray-500 break-all">
+                      {user?.email}
+                    </p>
+                    <p className="mt-4 text-sm text-gray-600">
+                      Keep the conversation going by opening the chat.
+                    </p>
                   </div>
-
                 </div>
-
+                <div className="mt-6 flex items-center gap-3">
+                  <button
+                    onClick={() => openChat(user)}
+                    className="flex-1 btn-primary py-3 font-semibold transition shadow-lg hover:opacity-95"
+                  >
+                    Chat Now
+                  </button>
+                </div>
               </div>
-
-
-              {/* BUTTONS */}
-              <div className="mt-6 flex items-center gap-3">
-
-                <button
-                  onClick={() => openChat(user)}
-                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:opacity-90 transition-all duration-200 font-semibold shadow-lg"
-                >
-                  Chat Now
-                </button>
-
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      )}
-
+            ))}
+          </div>
+        )}
+      </div>
     </div>
 
   );

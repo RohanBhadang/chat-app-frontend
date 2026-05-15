@@ -152,9 +152,9 @@ export default function Register() {
 
   return (
 
-    <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center px-4">
+    <div className="min-h-screen chat-bg flex items-center justify-center px-4">
 
-      <div className="w-full max-w-5xl bg-white rounded-[40px] shadow-xl overflow-hidden grid md:grid-cols-2">
+      <div className="w-full max-w-5xl card shadow-xl overflow-hidden grid md:grid-cols-2">
 
         {/* LEFT IMAGE */}
         <div className="hidden md:block h-[650px]">
@@ -172,7 +172,7 @@ export default function Register() {
 
           <div className="w-full max-w-md">
 
-            <h1 className="text-3xl font-bold text-[#2d6a4f] mb-2">
+            <h1 className="text-3xl font-bold text-[#3cbf88] mb-2">
               Create Account
             </h1>
 
@@ -194,7 +194,7 @@ export default function Register() {
                 onChange={(e) =>
                   setName(e.target.value)
                 }
-                className="w-full border border-[#b7e4c7] rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-[#40916c]"
+                className="w-full border border-[#d4efd6] rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-[#7ad5a4]"
               />
 
             </div>
@@ -213,7 +213,7 @@ export default function Register() {
                 onChange={(e) =>
                   setEmail(e.target.value)
                 }
-                className="w-full border border-[#b7e4c7] rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-[#40916c]"
+                className="w-full border border-[#d4efd6] rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-[#7ad5a4]"
               />
 
             </div>
@@ -234,7 +234,7 @@ export default function Register() {
                     e.target.value
                   )
                 }
-                className="w-full border border-[#b7e4c7] rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-[#40916c]"
+                className="w-full border border-[#d4efd6] rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-[#7ad5a4]"
               />
 
             </div>
@@ -251,7 +251,7 @@ export default function Register() {
             {/* BUTTON */}
             <button
               onClick={register}
-              className="w-full bg-[#2d6a4f] hover:bg-[#1b4332] transition text-white py-3 rounded-full font-semibold"
+              className="w-full btn-primary py-3 font-semibold transition"
             >
               Register
             </button>
@@ -265,7 +265,7 @@ export default function Register() {
                 onClick={() =>
                   navigate("/")
                 }
-                className="text-[#2d6a4f] font-semibold hover:underline"
+                className="text-[#3cbf88] font-semibold hover:underline"
               >
                 Login
               </button>

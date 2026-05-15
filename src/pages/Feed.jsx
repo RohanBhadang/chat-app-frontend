@@ -277,12 +277,12 @@ export default function Feed() {
 
   return (
 
-    <div className="min-h-screen bg-[#f5f5f5] py-10 px-4">
+    <div className="min-h-screen chat-bg py-10 px-4">
 
       {/* TOP */}
       <div className="max-w-7xl mx-auto mb-10">
 
-        <div className="bg-white rounded-[35px] shadow-lg p-8 border border-[#d8f3dc]">
+        <div className="card p-8 shadow-lg">
 
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 

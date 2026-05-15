@@ -167,7 +167,7 @@ export default function Requests() {
 
 //             <div
 //               key={req._id}
-//               className="bg-zinc-900/90 backdrop-blur-md border border-zinc-800 rounded-2xl p-5 shadow-xl hover:border-zinc-700 transition-all duration-300"
+//               className="card p-5 shadow-xl hover:border-gray-300 transition-all duration-300"
 //             >
 
 //               <div className="flex items-center justify-between flex-wrap gap-4">
@@ -242,7 +242,7 @@ export default function Requests() {
 
 // }
 return (
-  <div className="min-h-screen bg-gray-50 text-gray-900 p-6">
+  <div className="min-h-screen chat-bg text-gray-900 p-6">
 
     {/* HEADER */}
     <div className="max-w-3xl mx-auto mb-8 text-center">
@@ -306,7 +306,7 @@ return (
         {requests.map((req) => (
           <div
             key={req._id}
-            className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition"
+            className="card shadow-sm hover:shadow-md transition"
           >
 
             <div className="flex items-center justify-between flex-wrap gap-4">

@@ -51,12 +51,12 @@ export default function Chat() {
 
   return (
 
-    <div className="h-screen bg-gradient-to-br from-black via-zinc-900 to-black text-white overflow-hidden">
+    <div className="h-screen chat-bg text-gray-900 overflow-hidden">
 
       <div className="flex h-full">
 
         {/* SIDEBAR */}
-        <div className="w-[350px] border-r border-zinc-800 bg-zinc-900/70 backdrop-blur-xl">
+        <div className="w-[350px] border-r app-border app-surface">
 
           <Sidebar />
 
@@ -64,7 +64,7 @@ export default function Chat() {
 
 
         {/* CHAT AREA */}
-        <div className="flex-1 bg-zinc-950/40 backdrop-blur-xl">
+        <div className="flex-1 app-surface">
 
           <ChatBox />
 
