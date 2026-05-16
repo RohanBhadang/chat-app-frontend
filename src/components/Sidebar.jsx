@@ -108,7 +108,7 @@ export default function Sidebar() {
           >
 
             {/* AVATAR */}
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-lg font-bold uppercase shadow-lg">
+            <div className="w-14 h-14 rounded-full bg-green-200 flex items-center justify-center text-lg font-bold uppercase shadow-lg">
 
               {u?.name?.charAt(0)}
 
