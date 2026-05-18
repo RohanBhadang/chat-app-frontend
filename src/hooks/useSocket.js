@@ -39,9 +39,8 @@ export default function useSocket() {
     socket.off("receive_message");
     socket.off("new_notification");
 
-    // =========================
     // 📩 MESSAGE EVENT (ACTIVE CHAT)
-    // =========================
+   
     socket.on("receive_message", (data) => {
       console.log("📩 Received:", data);
 
@@ -50,9 +49,9 @@ export default function useSocket() {
       }
     });
 
-    // =========================
+
     // 🔔 NOTIFICATION EVENT
-    // =========================
+    
     socket.on("new_notification", (data) => {
       const activeChat = currentChatRef.current;
 

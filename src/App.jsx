@@ -2,7 +2,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
-
+import useSocket from "./hooks/useSocket";
 import Login from "./pages/Login";
 import Chat from "./pages/Chat";
 import Register from "./pages/Register";
@@ -29,6 +29,7 @@ function Layout({ children }) {
 }
 
 export default function App() {
+  useSocket();
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) connectSocket(token);
