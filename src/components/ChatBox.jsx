@@ -1,22 +1,177 @@
-
-import { useSelector } from "react-redux";
+﻿import { useSelector } from "react-redux";
 import { useState, useRef, useEffect } from "react";
 import { socket } from "../services/socket";
+import toast from "react-hot-toast";
 
 export default function ChatBox() {
   const { messages, chatId, selectedUser } = useSelector((s) => s.chat);
   const [text, setText] = useState("");
+  const [callStatus, setCallStatus] = useState("idle");
+  const [callType, setCallType] = useState(null);
+  const [callId, setCallId] = useState(null);
+  const [incomingCaller, setIncomingCaller] = useState(null);
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
 
-  const currentUserId = JSON.parse(
-    atob(localStorage.getItem("token")?.split(".")[1])
-  )?._id;
-
+  const peerRef = useRef(null);
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
   const endRef = useRef(null);
 
-  // auto scroll
+  const token = localStorage.getItem("token");
+  const currentUser = token ? JSON.parse(atob(token.split(".")[1])) : null;
+  const currentUserId = currentUser?._id;
+
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    const handleIncomingCall = (data) => {
+      setCallId(data.callId);
+      setCallType(data.callType);
+      setIncomingCaller({ id: data.callerId, name: data.callerName });
+      setCallStatus("incoming");
+      toast.success(`Incoming ${data.callType} call from ${data.callerName}`);
+    };
+
+    const handleAcceptCall = (data) => {
+      if (data.callId !== callId) return;
+      setCallStatus("connecting");
+      createOffer();
+    };
+
+    const handleRejectCall = (data) => {
+      if (data.callId !== callId) return;
+      toast.error("Call rejected");
+      cleanupCall();
+    };
+
+    const handleOffer = async (data) => {
+      if (data.callId !== callId) return;
+      setCallStatus("connecting");
+      await acceptOffer(data.signal);
+    };
+
+    const handleAnswer = async (data) => {
+      if (data.callId !== callId) return;
+      if (peerRef.current) {
+        await peerRef.current.setRemoteDescription(data.signal);
+      }
+      setCallStatus("in-call");
+    };
+
+    const handleIceCandidate = async (data) => {
+      if (data.callId !== callId || !peerRef.current) return;
+      try {
+        await peerRef.current.addIceCandidate(data.signal);
+      } catch (err) {
+        console.warn("ICE add failed", err);
+      }
+    };
+
+    const handleEndCall = (data) => {
+      if (data.callId !== callId) return;
+      toast(`Call ended${data.reason === "peer_disconnected" ? " (peer disconnected)" : ""}`);
+      cleanupCall();
+    };
+
+    const handleCallTimeout = (data) => {
+      if (data.callId !== callId) return;
+      toast.error("Call timed out: no answer");
+      cleanupCall();
+    };
+
+    const handleUserBusy = (data) => {
+      if (data.callId && data.callId !== callId) return;
+      toast.error("User is busy");
+      cleanupCall();
+    };
+
+    socket.on("incoming-call", handleIncomingCall);
+    socket.on("accept-call", handleAcceptCall);
+    socket.on("reject-call", handleRejectCall);
+    socket.on("offer", handleOffer);
+    socket.on("answer", handleAnswer);
+    socket.on("ice-candidate", handleIceCandidate);
+    socket.on("end-call", handleEndCall);
+    socket.on("call-timeout", handleCallTimeout);
+    socket.on("user-busy", handleUserBusy);
+
+    return () => {
+      socket.off("incoming-call", handleIncomingCall);
+      socket.off("accept-call", handleAcceptCall);
+      socket.off("reject-call", handleRejectCall);
+      socket.off("offer", handleOffer);
+      socket.off("answer", handleAnswer);
+      socket.off("ice-candidate", handleIceCandidate);
+      socket.off("end-call", handleEndCall);
+      socket.off("call-timeout", handleCallTimeout);
+      socket.off("user-busy", handleUserBusy);
+    };
+  }, [callId, currentUserId]);
+
+  const createPeerConnection = () => {
+    const pc = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    });
+
+    pc.onicecandidate = (event) => {
+      if (!event.candidate || !callId) return;
+      socket.emit("ice-candidate", {
+        callId,
+        signal: event.candidate,
+      });
+    };
+
+    pc.ontrack = (event) => {
+      setRemoteStream(event.streams[0]);
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = event.streams[0];
+      }
+    };
+
+    return pc;
+  };
+
+  const getLocalMedia = async (type) => {
+    if (localStream) return localStream;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: type === "video",
+      });
+      setLocalStream(stream);
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+      return stream;
+    } catch (err) {
+      toast.error("Unable to access microphone/camera");
+      cleanupCall();
+      throw err;
+    }
+  };
+
+  const cleanupCall = () => {
+    setCallStatus("idle");
+    setCallType(null);
+    setCallId(null);
+    setIncomingCaller(null);
+    setRemoteStream(null);
+
+    if (peerRef.current) {
+      peerRef.current.ontrack = null;
+      peerRef.current.onicecandidate = null;
+      peerRef.current.close();
+      peerRef.current = null;
+    }
+
+    if (localStream) {
+      localStream.getTracks().forEach((track) => track.stop());
+      setLocalStream(null);
+    }
+  };
 
   const send = () => {
     if (!text.trim()) return;
@@ -32,8 +187,102 @@ export default function ChatBox() {
       receiverId: selectedUser._id,
     });
 
-    
     setText("");
+  };
+
+  const startCall = async (type) => {
+    if (!selectedUser?._id) return;
+    setCallType(type);
+    setCallStatus("calling");
+
+    socket.emit(
+      "call-user",
+      {
+        targetUserId: selectedUser._id,
+        callType: type,
+      },
+      (response) => {
+        if (response?.status === "error") {
+          toast.error(response.message || "Call failed");
+          cleanupCall();
+          return;
+        }
+
+        setCallId(response?.data?.callId || null);
+      }
+    );
+  };
+
+  const acceptCall = async () => {
+    if (!callId) return;
+    socket.emit("accept-call", { callId }, (response) => {
+      if (response?.status === "error") {
+        toast.error(response.message || "Unable to accept call");
+        cleanupCall();
+      } else {
+        setCallStatus("connecting");
+      }
+    });
+  };
+
+  const rejectCall = () => {
+    if (!callId) return;
+    socket.emit("reject-call", { callId }, (response) => {
+      if (response?.status === "error") {
+        toast.error(response.message || "Unable to reject call");
+      }
+      cleanupCall();
+    });
+  };
+
+  const createOffer = async () => {
+    if (!callId) return;
+    const stream = await getLocalMedia(callType);
+    const pc = createPeerConnection();
+    peerRef.current = pc;
+    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    socket.emit("offer", { callId, signal: offer }, (response) => {
+      if (response?.status === "error") {
+        toast.error(response.message || "Offer failed");
+        cleanupCall();
+      }
+    });
+  };
+
+  const acceptOffer = async (signal) => {
+    if (!callId) return;
+    const stream = await getLocalMedia(callType);
+    const pc = createPeerConnection();
+    peerRef.current = pc;
+    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+
+    await pc.setRemoteDescription(signal);
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+
+    socket.emit("answer", { callId, signal: answer }, (response) => {
+      if (response?.status === "error") {
+        toast.error(response.message || "Answer failed");
+        cleanupCall();
+      } else {
+        setCallStatus("in-call");
+      }
+    });
+  };
+
+  const endCall = () => {
+    if (callId) {
+      socket.emit("end-call", { callId }, (response) => {
+        if (response?.status === "error") {
+          toast.error(response.message || "Unable to end call");
+        }
+      });
+    }
+    cleanupCall();
   };
 
   if (!selectedUser) {
@@ -48,29 +297,119 @@ export default function ChatBox() {
 
   return (
     <div className="flex flex-col flex-1 chat-bg h-screen relative">
-      {/* BACKGROUND PATTERN (subtle light feel) */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/white-carbon.png')] bg-repeat z-0"></div>
 
-      {/* HEADER */}
-      <div className="px-4 py-3 flex items-center chat-header z-10">
-        <div className="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold mr-3">
-          {selectedUser.name.charAt(0).toUpperCase()}
+      <div className="px-4 py-3 flex flex-col gap-3 chat-header z-10 bg-white/80 backdrop-blur-sm shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold">
+              {selectedUser.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div className="font-medium text-[16px]">{selectedUser.name}</div>
+              {callStatus !== "idle" && (
+                <div className="text-xs text-muted mt-1">
+                  {callStatus === "incoming" && `Incoming ${callType} call`}
+                  {callStatus === "calling" && `Calling ${selectedUser.name}...`}
+                  {callStatus === "connecting" && "Connecting..."}
+                  {callStatus === "in-call" && `In call (${callType})`}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => startCall("audio")}
+              className="rounded-full border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-100"
+            >
+              Audio
+            </button>
+            <button
+              onClick={() => startCall("video")}
+              className="rounded-full border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-100"
+            >
+              Video
+            </button>
+          </div>
         </div>
-        <div className="font-medium text-[16px]">
-          {selectedUser.name}
-        </div>
+
+        {callStatus === "incoming" && incomingCaller && (
+          <div className="rounded-2xl border border-amber-300 bg-amber-50 p-3 flex items-center justify-between gap-4">
+            <div>
+              <div className="text-sm font-semibold">Incoming {callType} call</div>
+              <div className="text-xs text-muted">{incomingCaller.name} is calling you</div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={acceptCall}
+                className="rounded-full bg-green-600 px-4 py-2 text-white text-sm font-semibold"
+              >
+                Accept
+              </button>
+              <button
+                onClick={rejectCall}
+                className="rounded-full bg-red-500 px-4 py-2 text-white text-sm font-semibold"
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        )}
+
+        {callStatus !== "idle" && callStatus !== "incoming" && (
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 flex items-center justify-between gap-4">
+            <div className="text-sm text-slate-700">
+              {callStatus === "calling" && `Calling ${selectedUser.name}...`}
+              {callStatus === "connecting" && "Establishing connection..."}
+              {callStatus === "in-call" && `Connected with ${selectedUser.name}`}
+            </div>
+            <button
+              onClick={endCall}
+              className="rounded-full bg-red-500 px-4 py-2 text-white text-sm font-semibold"
+            >
+              End Call
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* MESSAGES */}
+      {callStatus !== "idle" && (
+        <div className="px-4 pb-3 z-10 space-y-3">
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="rounded-2xl border border-slate-200 bg-black overflow-hidden min-h-[180px] relative">
+              <video
+                ref={localVideoRef}
+                autoPlay
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-1 text-xs text-white">
+                You
+              </div>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-black overflow-hidden min-h-[180px] relative">
+              <video
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-1 text-xs text-white">
+                {selectedUser.name}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 overflow-y-auto p-4 space-y-2 z-10 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         {messages.map((m, i) => {
-           const senderId =
-             typeof m.senderId === "object"
-              ? m.senderId?._id
-             : m.senderId;
-          let isMe = String(senderId) === String(currentUserId) ? true : false;
-          // console.log("senderId:", m.senderId, "currentUserId:", currentUserId, "isMe:", isMe);
- 
+          const senderId =
+            typeof m.senderId === "object" ? m.senderId?._id : m.senderId;
+          const isMe = String(senderId) === String(currentUserId);
+
           return (
             <div
               key={i}
@@ -83,20 +422,13 @@ export default function ChatBox() {
                     : "msg-recv rounded-tl-none"
                 }`}
               >
-                {/* sender name (only for others in groups, you can keep or remove this if it's 1-on-1) */}
                 {!isMe && m.senderId?.name && (
-                <span className="text-[12px] font-medium text-[#4a90e2] mb-0.5">
-                 {m.senderId.name}
-                 </span>
-                )}
-
-                {/* message text and time container */}
-                <div className="flex flex-wrap items-end gap-2">
-                  <span className="break-words max-w-full">
-                    {m.message}
+                  <span className="text-[12px] font-medium text-[#4a90e2] mb-0.5">
+                    {m.senderId.name}
                   </span>
-
-                  {/* time */}
+                )}
+                <div className="flex flex-wrap items-end gap-2">
+                  <span className="break-words max-w-full">{m.message}</span>
                   <span className="text-[11px] text-muted ml-auto min-w-fit mt-1">
                     {m.createdAt
                       ? new Date(m.createdAt).toLocaleTimeString([], {
@@ -110,12 +442,9 @@ export default function ChatBox() {
             </div>
           );
         })}
-
-        {/* auto scroll anchor */}
         <div ref={endRef} />
       </div>
 
-      {/* INPUT */}
       <div className="px-4 py-3 flex items-center gap-3 chat-input z-10">
         <input
           value={text}
