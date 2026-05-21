@@ -111,9 +111,20 @@ export default function ChatBox() {
     };
   }, [callId, currentUserId]);
 
+  const ICE_SERVERS = [
+    {
+      urls: [
+        "stun:stun.l.google.com:19302",
+        "stun:stun1.l.google.com:19302",
+        "stun:stun2.l.google.com:19302",
+      ],
+    },
+  ];
+
   const createPeerConnection = () => {
     const pc = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      iceServers: ICE_SERVERS,
+      iceTransportPolicy: "all",
     });
 
     pc.onicecandidate = (event) => {
@@ -128,6 +139,7 @@ export default function ChatBox() {
       setRemoteStream(event.streams[0]);
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = event.streams[0];
+        remoteVideoRef.current.play().catch(() => {});
       }
     };
 
@@ -135,15 +147,25 @@ export default function ChatBox() {
   };
 
   const getLocalMedia = async (type) => {
-    if (localStream) return localStream;
+    const needsVideo = type === "video";
+    const hasVideoTrack = localStream?.getVideoTracks().length > 0;
+
+    if (localStream && (!needsVideo || hasVideoTrack)) return localStream;
+
+    if (localStream) {
+      localStream.getTracks().forEach((track) => track.stop());
+      setLocalStream(null);
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
-        video: type === "video",
+        video: needsVideo,
       });
       setLocalStream(stream);
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
+        localVideoRef.current.play().catch(() => {});
       }
       return stream;
     } catch (err) {
