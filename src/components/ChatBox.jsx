@@ -64,7 +64,8 @@ export default function ChatBox() {
     const handleIceCandidate = async (data) => {
       if (data.callId !== callId || !peerRef.current) return;
       try {
-        await peerRef.current.addIceCandidate(data.signal);
+        const candidate = new RTCIceCandidate(data.signal);
+        await peerRef.current.addIceCandidate(candidate);
       } catch (err) {
         console.warn("ICE add failed", err);
       }
@@ -111,27 +112,37 @@ export default function ChatBox() {
     };
   }, [callId, currentUserId]);
 
+  const stunServers = [
+    "stun:stun.l.google.com:19302",
+    "stun:stun1.l.google.com:19302",
+    "stun:stun2.l.google.com:19302",
+  ];
+
+  const turnUrls = import.meta.env.VITE_TURN_URLS
+    ? import.meta.env.VITE_TURN_URLS.split(",").map((url) => url.trim()).filter(Boolean)
+    : [];
+  const turnUsername = import.meta.env.VITE_TURN_USERNAME || undefined;
+  const turnCredential = import.meta.env.VITE_TURN_CREDENTIAL || undefined;
+
   const ICE_SERVERS = [
-    {
-      urls: [
-        "stun:stun.l.google.com:19302",
-        "stun:stun1.l.google.com:19302",
-        "stun:stun2.l.google.com:19302",
-      ],
-    },
+    { urls: stunServers },
+    ...(turnUrls.length
+      ? [{ urls: turnUrls, username: turnUsername, credential: turnCredential }]
+      : []),
   ];
 
   const createPeerConnection = () => {
     const pc = new RTCPeerConnection({
       iceServers: ICE_SERVERS,
       iceTransportPolicy: "all",
+      iceCandidatePoolSize: 10,
     });
 
     pc.onicecandidate = (event) => {
       if (!event.candidate || !callId) return;
       socket.emit("ice-candidate", {
         callId,
-        signal: event.candidate,
+        signal: event.candidate.toJSON ? event.candidate.toJSON() : event.candidate,
       });
     };
 
