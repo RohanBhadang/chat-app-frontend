@@ -26,6 +26,20 @@ export default function ChatBox() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Safety net: Attach local stream as soon as the video element mounts
+  useEffect(() => {
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
+    }
+  }, [localStream, callStatus]);
+
+  // Safety net: Attach remote stream as soon as the video element mounts
+  useEffect(() => {
+    if (remoteVideoRef.current && remoteStream) {
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteStream, callStatus]);
+
   useEffect(() => {
     const handleIncomingCall = (data) => {
       setCallId(data.callId);
