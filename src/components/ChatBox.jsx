@@ -1,4 +1,4 @@
-﻿import { useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useState, useRef, useEffect } from "react";
 import { socket } from "../services/socket";
 import toast from "react-hot-toast";
@@ -334,182 +334,146 @@ export default function ChatBox() {
 
   if (!selectedUser) {
     return (
-      <div className="flex-1 flex items-center justify-center text-muted app-surface">
-        <div className="bg-white px-6 py-3 rounded-full shadow-sm">
-          Select a user to start chatting
+      <section className="flex-1 flex flex-col items-center justify-center bg-background text-on-surface-variant">
+        <div className="glass-panel px-8 py-4 rounded-2xl flex flex-col items-center gap-4 animate-pulse">
+          <span className="material-symbols-outlined text-4xl text-primary">chat_bubble</span>
+          <p className="font-medium">Select a conversation to begin</p>
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="flex flex-col flex-1 chat-bg h-screen relative">
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/white-carbon.png')] bg-repeat z-0"></div>
-
-      <div className="px-4 py-3 flex flex-col gap-3 chat-header z-10 bg-white/80 backdrop-blur-sm shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold">
-              {selectedUser.name.charAt(0).toUpperCase()}
+    <section className="flex-1 flex flex-col bg-background relative overflow-hidden">
+      {/* Chat Header */}
+      <header className="h-20 px-8 flex items-center justify-between glass-panel border-0 border-b border-white/10 shrink-0 z-10">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold uppercase border border-white/10">
+              {selectedUser.name.charAt(0)}
             </div>
-            <div>
-              <div className="font-medium text-[16px]">{selectedUser.name}</div>
-              {callStatus !== "idle" && (
-                <div className="text-xs text-muted mt-1">
-                  {callStatus === "incoming" && `Incoming ${callType} call`}
-                  {callStatus === "calling" && `Calling ${selectedUser.name}...`}
-                  {callStatus === "connecting" && "Connecting..."}
-                  {callStatus === "in-call" && `In call (${callType})`}
-                </div>
-              )}
-            </div>
+            <span className="absolute bottom-0 right-0 w-3 h-3 bg-secondary border-2 border-surface-dim rounded-full"></span>
           </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => startCall("audio")}
-              className="rounded-full border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-100"
-            >
-              Audio
-            </button>
-            <button
-              onClick={() => startCall("video")}
-              className="rounded-full border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-100"
-            >
-              Video
-            </button>
+          <div>
+            <h3 className="text-lg font-bold text-on-surface font-headline-md">{selectedUser.name}</h3>
+            <p className="text-[10px] text-secondary font-bold uppercase tracking-wider">
+               {callStatus === "idle" ? "Active Now" : callStatus}
+            </p>
           </div>
         </div>
-
-        {callStatus === "incoming" && incomingCaller && (
-          <div className="rounded-2xl border border-amber-300 bg-amber-50 p-3 flex items-center justify-between gap-4">
-            <div>
-              <div className="text-sm font-semibold">Incoming {callType} call</div>
-              <div className="text-xs text-muted">{incomingCaller.name} is calling you</div>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={acceptCall}
-                className="rounded-full bg-green-600 px-4 py-2 text-white text-sm font-semibold"
-              >
-                Accept
-              </button>
-              <button
-                onClick={rejectCall}
-                className="rounded-full bg-red-500 px-4 py-2 text-white text-sm font-semibold"
-              >
-                Reject
-              </button>
-            </div>
-          </div>
-        )}
-
-        {callStatus !== "idle" && callStatus !== "incoming" && (
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 flex items-center justify-between gap-4">
-            <div className="text-sm text-slate-700">
-              {callStatus === "calling" && `Calling ${selectedUser.name}...`}
-              {callStatus === "connecting" && "Establishing connection..."}
-              {callStatus === "in-call" && `Connected with ${selectedUser.name}`}
-            </div>
-            <button
-              onClick={endCall}
-              className="rounded-full bg-red-500 px-4 py-2 text-white text-sm font-semibold"
-            >
-              End Call
-            </button>
-          </div>
-        )}
-      </div>
-
-      {callStatus !== "idle" && (
-        <div className="px-4 pb-3 z-10 space-y-3">
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 bg-black overflow-hidden min-h-[180px] relative">
-              <video
-                ref={localVideoRef}
-                autoPlay
-                muted
-                playsInline
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-1 text-xs text-white">
-                You
-              </div>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-black overflow-hidden min-h-[180px] relative">
-              <video
-                ref={remoteVideoRef}
-                autoPlay
-                playsInline
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-1 text-xs text-white">
-                {selectedUser.name}
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => startCall("audio")} className="p-3 rounded-full hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all">
+            <span className="material-symbols-outlined">call</span>
+          </button>
+          <button onClick={() => startCall("video")} className="p-3 rounded-full hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all">
+            <span className="material-symbols-outlined">videocam</span>
+          </button>
+          <button className="p-3 rounded-full hover:bg-white/5 text-on-surface-variant transition-all">
+            <span className="material-symbols-outlined">more_vert</span>
+          </button>
         </div>
-      )}
+      </header>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-2 z-10 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+      {/* Chat Body */}
+      <div className="flex-1 overflow-y-auto p-8 space-y-8 flex flex-col">
         {messages.map((m, i) => {
-          const senderId =
-            typeof m.senderId === "object" ? m.senderId?._id : m.senderId;
+          const senderId = typeof m.senderId === "object" ? m.senderId?._id : m.senderId;
           const isMe = String(senderId) === String(currentUserId);
-
           return (
-            <div
-              key={i}
-              className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`relative max-w-[75%] md:max-w-[65%] px-2.5 py-1.5 rounded-lg text-[15px] shadow-sm flex flex-col ${
-                  isMe
-                    ? "msg-sent rounded-tr-none"
-                    : "msg-recv rounded-tl-none"
-                }`}
-              >
-                {!isMe && m.senderId?.name && (
-                  <span className="text-[12px] font-medium text-[#4a90e2] mb-0.5">
-                    {m.senderId.name}
-                  </span>
-                )}
-                <div className="flex flex-wrap items-end gap-2">
-                  <span className="break-words max-w-full">{m.message}</span>
-                  <span className="text-[11px] text-muted ml-auto min-w-fit mt-1">
-                    {m.createdAt
-                      ? new Date(m.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
-                      : ""}
-                  </span>
-                </div>
+            <div key={i} className={`flex flex-col ${isMe ? "items-end" : "items-start"} gap-1`}>
+              <div className={`max-w-[80%] p-4 rounded-xl text-sm ${
+                isMe 
+                ? "bg-primary text-on-primary rounded-br-none active-glow" 
+                : "glass-panel text-on-surface rounded-bl-none"
+              }`}>
+                {m.message}
               </div>
+              <span className="text-[10px] text-on-surface-variant opacity-40 px-1">
+                {m.createdAt ? new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Just now"}
+              </span>
             </div>
           );
         })}
         <div ref={endRef} />
       </div>
 
-      <div className="px-4 py-3 flex items-center gap-3 chat-input z-10">
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
-          className="flex-1 p-2.5 px-4 rounded-lg bg-white text-gray-900 outline-none text-[15px] placeholder:text-muted border border-[var(--border)]"
-          placeholder="Type a message"
-        />
-        <button
-          onClick={send}
-          disabled={!text.trim()}
-          className="p-2.5 primary-btn rounded-full font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-        >
-          <svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor">
-            <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
+      {/* Chat Input */}
+      <footer className="p-8 pt-0 z-10">
+        <div className="glass-panel rounded-2xl p-2 flex items-center gap-2">
+          <button className="p-3 text-on-surface-variant hover:text-primary transition-colors">
+            <span className="material-symbols-outlined">add_circle</span>
+          </button>
+          <input
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && send()}
+            className="flex-1 bg-transparent border-none focus:ring-0 text-on-surface text-sm px-2 outline-none"
+            placeholder="Type your message..."
+            type="text"
+          />
+          <button onClick={send} className="bg-primary text-on-primary w-12 h-12 rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
+            <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>send</span>
+          </button>
+        </div>
+      </footer>
+
+      {/* Call Overlays */}
+      {(callStatus === "incoming" || callStatus === "calling" || callStatus === "connecting" || callStatus === "in-call") && (
+        <div className="absolute inset-0 z-[100] bg-surface-dim/80 backdrop-blur-2xl flex flex-col items-center justify-center p-8">
+          {callStatus === "in-call" && callType === "video" ? (
+            <div className="w-full h-full flex flex-col gap-4">
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="glass-panel rounded-2xl overflow-hidden relative">
+                   <video ref={localVideoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
+                   <div className="absolute bottom-4 left-4 glass-panel px-3 py-1 rounded-full text-xs">You</div>
+                </div>
+                <div className="glass-panel rounded-2xl overflow-hidden relative">
+                   <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
+                   <div className="absolute bottom-4 left-4 glass-panel px-3 py-1 rounded-full text-xs">{selectedUser.name}</div>
+                </div>
+              </div>
+              <div className="flex justify-center gap-4 pb-8">
+                 <button onClick={endCall} className="w-16 h-16 rounded-full bg-error text-on-error flex items-center justify-center shadow-lg hover:scale-110 transition-all">
+                    <span className="material-symbols-outlined text-3xl" style={{fontVariationSettings: "'FILL' 1"}}>call_end</span>
+                 </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="ringing-pulse w-48 h-48 rounded-full border-4 flex items-center justify-center mb-8 p-2">
+                <div className="w-full h-full rounded-full bg-primary/20 flex items-center justify-center text-primary text-4xl font-bold uppercase">
+                  {callStatus === "incoming" ? incomingCaller?.name?.charAt(0) : selectedUser.name.charAt(0)}
+                </div>
+              </div>
+              <div className="text-center space-y-2 mb-12">
+                <h2 className="text-4xl font-bold text-on-surface">
+                  {callStatus === "incoming" ? incomingCaller?.name : selectedUser.name}
+                </h2>
+                <p className="text-lg text-primary animate-pulse uppercase tracking-widest font-bold">
+                  {callStatus === "incoming" ? `Incoming ${callType} Call...` : 
+                   callStatus === "calling" ? "Calling..." : "Connecting..."}
+                </p>
+              </div>
+              <div className="flex gap-8">
+                {callStatus === "incoming" ? (
+                  <>
+                    <button onClick={rejectCall} className="w-20 h-20 rounded-full bg-error text-on-error flex items-center justify-center shadow-lg hover:scale-110 transition-all">
+                      <span className="material-symbols-outlined text-4xl" style={{fontVariationSettings: "'FILL' 1"}}>call_end</span>
+                    </button>
+                    <button onClick={acceptCall} className="w-20 h-20 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow-lg hover:scale-110 transition-all">
+                      <span className="material-symbols-outlined text-4xl" style={{fontVariationSettings: "'FILL' 1"}}>videocam</span>
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={endCall} className="w-20 h-20 rounded-full bg-error text-on-error flex items-center justify-center shadow-lg hover:scale-110 transition-all">
+                    <span className="material-symbols-outlined text-4xl" style={{fontVariationSettings: "'FILL' 1"}}>call_end</span>
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </section>
   );
 }

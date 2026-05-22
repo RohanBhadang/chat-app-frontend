@@ -3,148 +3,101 @@ import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 
 export default function Connections() {
-
-  const [connections, setConnections] =
-    useState([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
+  const [connections, setConnections] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-
-  // FETCH CONNECTIONS
-  const fetchConnections =
-    async () => {
-
-      try {
-
-        setLoading(true);
-
-        const res =
-          await API.get(
-            "/requests/connections"
-          );
-
-        setConnections(
-          res.data.data
-        );
-
-      } catch (error) {
-
-        console.log(
-          error.response?.data ||
-          error.message
-        );
-
-      } finally {
-
-        setLoading(false);
-
-      }
-
-    };
-
-
-  useEffect(() => {
-
-    fetchConnections();
-
-  }, []);
-
-
-  // OPEN CHAT
-  const openChat = (user) => {
-
-    navigate(`/chat/${user._id}`, {
-      state: {
-        user,
-      },
-    });
-
+  const fetchConnections = async () => {
+    try {
+      setLoading(true);
+      const res = await API.get("/requests/connections");
+      setConnections(res.data.data);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  useEffect(() => {
+    fetchConnections();
+  }, []);
+
+  const openChat = (user) => {
+    navigate(`/chat/${user._id}`, {
+      state: { user },
+    });
+  };
 
   return (
-
-    <div className="min-h-screen chat-bg text-gray-900 p-6">
-
-      <div className="max-w-5xl mx-auto space-y-6">
-
-        <section className="card p-8 shadow-lg">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <main className="md:pl-[280px] pt-20 min-h-screen bg-background text-on-surface p-6 md:p-container-padding-desktop">
+      <div className="max-w-5xl mx-auto">
+        {/* Header Section */}
+        <header className="mb-12">
+          <p className="text-xs uppercase tracking-[0.3em] text-primary font-bold mb-3">Your Network</p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <h1 className="text-4xl font-bold tracking-tight text-primary">
-                My Connections
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight font-display-lg text-on-surface">
+                My <span className="text-secondary">Connections</span>
               </h1>
-              <p className="text-gray-500 mt-2">
-                People connected with you in Gutargu.
+              <p className="mt-4 text-on-surface-variant max-w-xl text-lg font-body-lg">
+                The core of your professional and personal circle. Stay in touch and nurture your relationships.
               </p>
             </div>
-            <div className="rounded-full bg-[#e9f7ee] border border-[#c7ecd0] px-4 py-2 text-sm font-semibold text-[#2d6a4f] shadow-sm">
-              {connections.length} connected
+            <div className="glass-panel px-8 py-4 rounded-2xl flex flex-col items-center justify-center min-w-[140px]">
+              <span className="text-3xl font-bold text-primary font-display-lg">{connections.length}</span>
+              <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Total</span>
             </div>
           </div>
-        </section>
+        </header>
 
         {loading ? (
-          <div className="grid gap-5 md:grid-cols-2">
-            {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="animate-pulse card p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-gray-200"></div>
-                  <div className="flex-1 space-y-3 py-1">
-                    <div className="h-4 w-3/4 bg-gray-200 rounded"></div>
-                    <div className="h-3 w-1/2 bg-gray-200 rounded"></div>
-                    <div className="h-10 w-full bg-gray-200 rounded-full"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="glass-panel rounded-3xl p-8 animate-pulse">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 rounded-full bg-white/5"></div>
+                  <div className="flex-1 space-y-3">
+                    <div className="h-4 w-1/2 bg-white/5 rounded"></div>
+                    <div className="h-3 w-3/4 bg-white/5 rounded"></div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : connections.length === 0 ? (
-          <div className="card p-10 text-center">
-            <h2 className="text-2xl font-semibold mb-3 text-gray-900">
-              No Connections Yet
-            </h2>
-            <p className="text-gray-500">
-              Accept requests to start chatting and build your network.
-            </p>
+          <div className="col-span-full glass-panel rounded-[40px] p-20 text-center border-dashed border-white/10">
+            <span className="material-symbols-outlined text-6xl text-on-surface-variant mb-6">diversity_1</span>
+            <h2 className="text-2xl font-bold text-on-surface">Your circle is waiting</h2>
+            <p className="mt-2 text-on-surface-variant">Accept requests or find new people to start your journey.</p>
+            <button onClick={() => navigate("/feed")} className="mt-8 bg-primary text-on-primary px-8 py-4 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20">Explore Feed</button>
           </div>
         ) : (
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {connections.map((user) => (
-              <div
-                key={user._id}
-                className="card p-6 shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#25D366] via-[#1fae4f] to-[#128c7e] flex items-center justify-center text-2xl font-bold uppercase text-white shadow-lg">
+              <div key={user._id} className="glass-panel rounded-3xl p-6 hover:active-glow transition-all duration-300 group">
+                <div className="flex items-center gap-5 mb-6">
+                  <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center text-2xl font-bold text-secondary border border-secondary/20 shadow-lg group-hover:scale-110 transition-transform duration-500 uppercase">
                     {user?.name?.charAt(0) || "U"}
                   </div>
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <h2 className="text-xl font-semibold text-gray-900">
-                        {user?.name}
-                      </h2>
-                      <span className="rounded-full bg-[#e9f7ee] px-3 py-1 text-xs font-semibold text-[#2d6a4f]">
-                        Connected
-                      </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                       <h2 className="text-xl font-bold text-on-surface truncate">{user?.name}</h2>
+                       <span className="w-2 h-2 rounded-full bg-secondary"></span>
                     </div>
-                    <p className="mt-2 text-sm text-gray-500 break-all">
-                      {user?.email}
-                    </p>
-                    <p className="mt-4 text-sm text-gray-600">
-                      Keep the conversation going by opening the chat.
-                    </p>
+                    <p className="text-xs text-on-surface-variant opacity-70 truncate">{user?.email}</p>
                   </div>
                 </div>
-                <div className="mt-6 flex items-center gap-3">
+                <div className="flex items-center gap-3">
                   <button
                     onClick={() => openChat(user)}
-                    className="flex-1 btn-primary py-3 font-semibold transition shadow-lg hover:opacity-95"
+                    className="flex-1 bg-white/5 text-on-surface py-4 rounded-xl font-bold text-sm hover:bg-white/10 active:scale-95 transition-all border border-white/10 flex items-center justify-center gap-2 group/btn"
                   >
+                    <span className="material-symbols-outlined text-xl text-primary group-hover/btn:scale-110 transition-transform">chat_bubble</span>
                     Chat Now
+                  </button>
+                  <button className="glass-panel p-4 rounded-xl text-on-surface-variant hover:text-error hover:bg-error/5 transition-all">
+                     <span className="material-symbols-outlined">person_remove</span>
                   </button>
                 </div>
               </div>
@@ -152,8 +105,6 @@ export default function Connections() {
           </div>
         )}
       </div>
-    </div>
-
+    </main>
   );
-
 }

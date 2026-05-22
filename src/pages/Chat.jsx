@@ -7,73 +7,28 @@ import ChatBox from "../components/ChatBox";
 import useSocket from "../hooks/useSocket";
 
 export default function Chat() {
-
   useSocket();
-
-  const dispatch =
-    useDispatch();
-
+  const dispatch = useDispatch();
 
   useEffect(() => {
-
-    const fetchConnectedUsers =
-      async () => {
-
-        try {
-
-          const res =
-            await API.get(
-              "/requests/connections"
-            );
-
-          dispatch(
-            setUsers(
-              res.data.data
-            )
-          );
-
-        } catch (err) {
-
-          console.log(
-            "Users fetch error",
-            err
-          );
-
-        }
-
-      };
-
+    const fetchConnectedUsers = async () => {
+      try {
+        const res = await API.get("/requests/connections");
+        dispatch(setUsers(res.data.data));
+      } catch (err) {
+        console.log("Users fetch error", err);
+      }
+    };
     fetchConnectedUsers();
-
-  }, []);
-
-
+  }, [dispatch]);
 
   return (
+    <main className="md:pl-[280px] pt-20 h-screen flex overflow-hidden bg-background">
+      {/* Left Panel: Conversations List */}
+      <Sidebar />
 
-    <div className="h-screen chat-bg text-gray-900 overflow-hidden">
-
-      <div className="flex h-full">
-
-        {/* SIDEBAR */}
-        <div className="w-[350px] border-r app-border app-surface">
-
-          <Sidebar />
-
-        </div>
-
-
-        {/* CHAT AREA */}
-        <div className="flex-1 app-surface">
-
-          <ChatBox />
-
-        </div>
-
-      </div>
-
-    </div>
-
+      {/* Main Panel: Active Chat */}
+      <ChatBox />
+    </main>
   );
-
 }

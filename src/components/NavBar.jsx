@@ -1,95 +1,152 @@
-
 import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import logochat from "../assets/logochat.jpeg";
-export default function Navbar() {
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
+export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [open, setOpen] = useState(false);
+  const { user } = useSelector((s) => s.auth);
 
   const logout = () => {
     localStorage.removeItem("token");
     navigate("/");
   };
 
-  const navItem = (label, path) => (
-    <button
-      onClick={() => navigate(path)}
-      className={`px-4 py-2 rounded-full text-sm font-semibold transition ${
-        location.pathname === path
-          ? "nav-active"
-          : "text-[#2d6a4f] hover:bg-[#f1fff5]"
-      }`}
-    >
-      {label}
-    </button>
-  );
+  const navItems = [
+    { label: "Feed", path: "/feed", icon: "home" },
+    { label: "Requests", path: "/requests", icon: "person_add" },
+    { label: "Connections", path: "/connections", icon: "group" },
+    { label: "Messages", path: "/connections", icon: "chat_bubble" }, // In this app, connections leads to chat list
+  ];
 
   return (
-    <div className="w-full navbar-surface shadow-sm sticky top-0 z-50">
-
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-
-        {/* LOGO */}
-        <div
-          onClick={() => navigate("/feed")}
-          className="text-2xl font-bold text-[#2d6a4f] cursor-pointer"
-          
-        > <img
-          src={logochat}
-          alt="GuterGu"
-          className="h-20 w-30 object-contain"
-        />
-        
-         
+    <>
+      {/* Top AppBar */}
+      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 md:px-container-padding-desktop h-20 bg-surface/60 backdrop-blur-2xl border-b border-white/10">
+        <div className="flex items-center gap-4">
+          <span 
+            className="text-2xl font-bold tracking-tighter text-primary cursor-pointer"
+            onClick={() => navigate("/feed")}
+          >
+            Luxe
+          </span>
         </div>
 
-        {/* DESKTOP MENU */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-8 text-on-surface-variant text-sm font-semibold">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`transition-colors duration-200 hover:text-primary ${
+                  location.pathname === item.path ? "text-primary font-bold" : ""
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
 
-          {navItem("Feed", "/feed")}
-          {navItem("Chat", "/connections")}
-          {navItem("Requests", "/requests")}
+          <div className="flex items-center gap-4">
+            <button className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+            <button className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">settings</button>
+            <div className="w-10 h-10 rounded-full overflow-hidden border border-white/20 bg-primary/20 flex items-center justify-center text-primary font-bold uppercase">
+              {user?.name?.charAt(0) || "U"}
+            </div>
+            <button 
+              className="md:hidden material-symbols-outlined text-on-surface-variant"
+              onClick={() => setOpen(!open)}
+            >
+              {open ? "close" : "menu"}
+            </button>
+          </div>
+        </div>
+      </header>
 
+      {/* Side NavBar (Desktop) */}
+      <aside className="fixed left-0 top-0 h-full pt-24 pb-8 flex flex-col z-40 bg-surface-dim/60 backdrop-blur-xl border-r border-white/10 w-[280px] hidden md:flex">
+        <div className="px-6 mb-8">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold uppercase">
+               {user?.name?.charAt(0) || "U"}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-on-surface">{user?.name || "User"}</p>
+              <p className="text-[10px] text-secondary flex items-center gap-1 uppercase tracking-wider font-bold">
+                <span className="w-1.5 h-1.5 bg-secondary rounded-full"></span> Active Now
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <nav className="flex-1 px-2 space-y-1">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-4 py-3 pl-4 transition-all duration-300 hover:bg-white/5 hover:translate-x-1 ${
+                location.pathname === item.path 
+                  ? "text-primary border-l-2 border-primary bg-primary/5" 
+                  : "text-on-surface-variant"
+              }`}
+            >
+              <span className="material-symbols-outlined">{item.icon}</span>
+              <span className="text-sm font-medium">{item.label}</span>
+            </Link>
+          ))}
           <button
             onClick={logout}
-            className="ml-2 px-5 py-2 rounded-full bg-red-500 text-white font-semibold hover:bg-red-600 transition"
+            className="w-full flex items-center gap-4 py-3 pl-4 text-error hover:bg-white/5 transition-all duration-300"
           >
-            Logout
+            <span className="material-symbols-outlined">logout</span>
+            <span className="text-sm font-medium">Logout</span>
           </button>
+        </nav>
 
+        <div className="px-6 mt-auto">
+          <button className="w-full bg-primary-container text-on-primary-container py-3 rounded-xl text-sm font-bold active:scale-95 transition-transform">
+            New Post
+          </button>
         </div>
+      </aside>
 
-        {/* MOBILE MENU BUTTON */}
-        <button
-          className="md:hidden text-[#2d6a4f] text-2xl"
-          onClick={() => setOpen(!open)}
-        >
-          ☰
-        </button>
-
-      </div>
-
-      {/* MOBILE MENU */}
+      {/* Mobile Menu Overlay */}
       {open && (
-        <div className="md:hidden px-4 pb-4 flex flex-col gap-2">
-
-          {navItem("Feed", "/feed")}
-          {navItem("Chat", "/chat")}
-          {navItem("Requests", "/requests")}
-
-          <button
-            onClick={logout}
-            className="mt-2 px-4 py-2 rounded-full bg-red-500 text-white font-semibold"
-          >
-            Logout
-          </button>
-
+        <div className="fixed inset-0 z-[60] bg-surface-dim/95 backdrop-blur-xl flex flex-col p-8 md:hidden">
+          <div className="flex justify-between items-center mb-12">
+            <span className="text-2xl font-bold text-primary">Luxe</span>
+            <button 
+              className="material-symbols-outlined text-on-surface-variant"
+              onClick={() => setOpen(false)}
+            >
+              close
+            </button>
+          </div>
+          <nav className="flex flex-col gap-6">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setOpen(false)}
+                className={`flex items-center gap-4 text-xl ${
+                  location.pathname === item.path ? "text-primary font-bold" : "text-on-surface-variant"
+                }`}
+              >
+                <span className="material-symbols-outlined text-2xl">{item.icon}</span>
+                {item.label}
+              </Link>
+            ))}
+            <button
+              onClick={() => { setOpen(false); logout(); }}
+              className="flex items-center gap-4 text-xl text-error"
+            >
+              <span className="material-symbols-outlined text-2xl">logout</span>
+              Logout
+            </button>
+          </nav>
         </div>
       )}
-
-    </div>
+    </>
   );
 }
