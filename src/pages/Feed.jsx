@@ -48,7 +48,7 @@ export default function Feed() {
   };
 
   return (
-    <main className="md:pl-[280px] pt-20 min-h-screen bg-background text-on-surface p-6 md:p-container-padding-desktop">
+    <main className="md:pl-[280px] pt-28 md:pt-32 pb-8 px-6 md:px-10 min-h-screen bg-background text-on-surface">
       <div className="max-w-5xl mx-auto">
         {/* Header Section */}
         <header className="mb-12">

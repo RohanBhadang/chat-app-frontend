@@ -1,9 +1,11 @@
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useState, useRef, useEffect } from "react";
 import { socket } from "../services/socket";
 import toast from "react-hot-toast";
+import { setSelectedUser, setChatId } from "../redux/chatSlice";
 
 export default function ChatBox() {
+  const dispatch = useDispatch();
   const { messages, chatId, selectedUser } = useSelector((s) => s.chat);
   const [text, setText] = useState("");
   const [callStatus, setCallStatus] = useState("idle");
@@ -334,7 +336,7 @@ export default function ChatBox() {
 
   if (!selectedUser) {
     return (
-      <section className="flex-1 flex flex-col items-center justify-center bg-background text-on-surface-variant">
+      <section className="flex-1 flex-col items-center justify-center bg-background text-on-surface-variant hidden md:flex">
         <div className="glass-panel px-8 py-4 rounded-2xl flex flex-col items-center gap-4 animate-pulse">
           <span className="material-symbols-outlined text-4xl text-primary">chat_bubble</span>
           <p className="font-medium">Select a conversation to begin</p>
@@ -346,8 +348,17 @@ export default function ChatBox() {
   return (
     <section className="flex-1 flex flex-col bg-background relative overflow-hidden">
       {/* Chat Header */}
-      <header className="h-20 px-8 flex items-center justify-between glass-panel border-0 border-b border-white/10 shrink-0 z-10">
-        <div className="flex items-center gap-4">
+      <header className="h-20 px-4 md:px-8 flex items-center justify-between glass-panel border-0 border-b border-white/10 shrink-0 z-10">
+        <div className="flex items-center gap-3 md:gap-4">
+          <button 
+            className="md:hidden p-2 -ml-2 rounded-full hover:bg-white/5 text-on-surface-variant transition-all"
+            onClick={() => {
+               dispatch(setSelectedUser(null));
+               dispatch(setChatId(null));
+            }}
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
           <div className="relative">
             <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold uppercase border border-white/10">
               {selectedUser.name.charAt(0)}
@@ -367,9 +378,6 @@ export default function ChatBox() {
           </button>
           <button onClick={() => startCall("video")} className="p-3 rounded-full hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all">
             <span className="material-symbols-outlined">videocam</span>
-          </button>
-          <button className="p-3 rounded-full hover:bg-white/5 text-on-surface-variant transition-all">
-            <span className="material-symbols-outlined">more_vert</span>
           </button>
         </div>
       </header>
@@ -398,11 +406,8 @@ export default function ChatBox() {
       </div>
 
       {/* Chat Input */}
-      <footer className="p-8 pt-0 z-10">
+      <footer className="p-4 md:p-8 md:pt-0 z-10">
         <div className="glass-panel rounded-2xl p-2 flex items-center gap-2">
-          <button className="p-3 text-on-surface-variant hover:text-primary transition-colors">
-            <span className="material-symbols-outlined">add_circle</span>
-          </button>
           <input
             value={text}
             onChange={(e) => setText(e.target.value)}

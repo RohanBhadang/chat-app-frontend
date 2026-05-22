@@ -22,7 +22,7 @@ export default function Sidebar() {
   };
 
   return (
-    <section className="w-full md:w-80 border-r border-white/10 flex flex-col glass-panel">
+    <section className={`w-full md:w-80 border-r border-white/10 flex-col glass-panel ${selectedUser ? 'hidden md:flex' : 'flex'}`}>
       <div className="p-6">
         <h2 className="text-xl font-bold text-on-surface font-headline-md">Chats</h2>
         <div className="mt-4 relative">

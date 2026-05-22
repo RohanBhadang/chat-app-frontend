@@ -30,7 +30,7 @@ export default function Connections() {
   };
 
   return (
-    <main className="md:pl-[280px] pt-20 min-h-screen bg-background text-on-surface p-6 md:p-container-padding-desktop">
+    <main className="md:pl-[280px] pt-28 md:pt-32 pb-8 px-6 md:px-10 min-h-screen bg-background text-on-surface">
       <div className="max-w-5xl mx-auto">
         {/* Header Section */}
         <header className="mb-12">
@@ -95,9 +95,6 @@ export default function Connections() {
                   >
                     <span className="material-symbols-outlined text-xl text-primary group-hover/btn:scale-110 transition-transform">chat_bubble</span>
                     Chat Now
-                  </button>
-                  <button className="glass-panel p-4 rounded-xl text-on-surface-variant hover:text-error hover:bg-error/5 transition-all">
-                     <span className="material-symbols-outlined">person_remove</span>
                   </button>
                 </div>
               </div>
