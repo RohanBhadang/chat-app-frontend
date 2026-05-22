@@ -95,7 +95,7 @@ export default function Login() {
                   <input type="checkbox" className="w-5 h-5 rounded-lg bg-white/5 border-white/10 text-primary focus:ring-0 focus:ring-offset-0 transition-all" />
                   <span className="group-hover:text-on-surface transition-colors">Stay Signed In</span>
                 </label>
-                <button className="text-primary hover:text-primary-container transition-colors">Recovery</button>
+                {/* <button className="text-primary hover:text-primary-container transition-colors">Recovery</button> */}
               </div>
 
               {error && (
@@ -114,17 +114,17 @@ export default function Login() {
 
               <div className="relative flex items-center justify-center py-4">
                 <div className="absolute w-full h-[1px] bg-white/10"></div>
-                <span className="relative bg-surface-dim/40 px-6 text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.3em]">Identity Hub</span>
+                <span className="relative bg-surface-dim/40 px-6 text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.3em]">New Registration</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-2 gap-4">
                 <button className="flex items-center justify-center gap-3 py-4 rounded-2xl glass-panel hover:bg-white/10 transition-all border-white/10 text-xs font-bold uppercase tracking-widest">
                   Google
                 </button>
                 <button className="flex items-center justify-center gap-3 py-4 rounded-2xl glass-panel hover:bg-white/10 transition-all border-white/10 text-xs font-bold uppercase tracking-widest">
                   Apple
                 </button>
-              </div>
+              </div> */}
 
               <p className="text-center text-xs text-on-surface-variant font-bold uppercase tracking-widest mt-8">
                 New here?{" "}
